@@ -24,6 +24,14 @@
             }
         },
         {
+            "name": "dev-no-cache",
+            "inherits": "dev",
+            "binaryDir": "${sourceDir}/build-dev-no-cache",
+            "cacheVariables": {
+                "ENABLE_CACHE": "OFF"
+            }
+        },
+        {
             "name": "dev-asan",
             "description": "dev-asan",
             "inherits": "base",

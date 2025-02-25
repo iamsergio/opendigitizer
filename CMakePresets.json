@@ -10,6 +10,7 @@
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "DISABLE_WASM_BUILD": "ON",
                 "OPENDIGITIZER_ENABLE_TESTING": "ON",
+                "CMAKE_POLICY_VERSION_MINIMUM": "3.5",
                 "USE_DWARF4": "ON"
             }
         },
@@ -21,6 +22,23 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "ENABLE_IMGUI_TEST_ENGINE": "ON"
+            }
+        },
+        {
+            "name": "dev-clang",
+            "inherits": "dev",
+            "binaryDir": "${sourceDir}/build-dev-clang",
+            "environment": {
+                "CXX": "clang++",
+                "CC": "clang"
+            }
+        },
+        {
+            "name": "dev-no-cache",
+            "inherits": "dev",
+            "binaryDir": "${sourceDir}/build-dev-no-cache",
+            "cacheVariables": {
+                "ENABLE_CACHE": "OFF"
             }
         },
         {

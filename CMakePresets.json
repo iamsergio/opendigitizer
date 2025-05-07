@@ -7,7 +7,7 @@
             "generator": "Ninja",
             "cacheVariables": {
                 "ENABLE_COVERAGE": "OFF",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "OFF",
                 "DISABLE_WASM_BUILD": "ON",
                 "OPENDIGITIZER_ENABLE_TESTING": "ON",
                 "CMAKE_POLICY_VERSION_MINIMUM": "3.5",
@@ -22,6 +22,10 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "ENABLE_IMGUI_TEST_ENGINE": "ON"
+            },
+            "environment": {
+                "CXX": "g++-14",
+                "CC": "gcc-14"
             }
         },
         {
@@ -31,6 +35,9 @@
             "environment": {
                 "CXX": "clang++",
                 "CC": "clang"
+            },
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
             }
         },
         {

@@ -15,6 +15,10 @@ if(OPENDIGITIZER_ENABLE_ASAN)
   add_link_options(-fsanitize=address)
 endif()
 
+if(NOT CMAKE_CXX_COMPILER_ID MATCHES ".*Clang" AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 15.0)
+    add_compile_options(-Wno-error=template-body -Wno-deprecated-literal-operator)
+endif()
+
 include(ExternalProject)
 
 # Mainly for FMT

@@ -109,4 +109,4 @@ if(NOT DISABLE_WASM_BUILD)
       ${ROOT_BUILD_DIR}/ui-wasm/web)
 endif()
 
-add_subdirectory(src/service)
+# add_subdirectory(src/service)

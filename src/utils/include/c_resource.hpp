@@ -3,7 +3,7 @@
 
 #include <version>
 
-#if __cpp_lib_modules >= 202207L
+#if __cpp_lib_modules >= 202207L && 0
 import std;
 #else
 

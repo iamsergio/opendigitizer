@@ -19,6 +19,13 @@ if(NOT CMAKE_CXX_COMPILER_ID MATCHES ".*Clang" AND CMAKE_CXX_COMPILER_ID STREQUA
     add_compile_options(-Wno-error=template-body -Wno-deprecated-literal-operator)
 endif()
 
+if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang") # set default C++ STL to Clang's libc++ when using Clang
+  add_compile_options(-stdlib=libc++ -fexperimental-library)
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -stdlib=libc++ -lc++")
+endif()
+
+
 include(ExternalProject)
 
 # Mainly for FMT

@@ -51,10 +51,10 @@ FetchContent_Declare(
   SYSTEM)
 
 FetchContent_Declare(
-  gnuradio4
-  GIT_REPOSITORY https://github.com/fair-acc/gnuradio4.git
-  GIT_TAG ${GIT_SHA_GNURADIO4}
-  SYSTEM)
+    gnuradio4
+    SYSTEM
+    SOURCE_DIR /data/sources/fair/gnuradio4/
+)
 
 FetchContent_MakeAvailable(
   imgui
@@ -68,13 +68,13 @@ FetchContent_MakeAvailable(
 if(NOT EMSCRIPTEN)
   find_package(SDL2 REQUIRED)
   find_package(OpenGL REQUIRED COMPONENTS OpenGL)
-  FetchContent_Declare(
-    sdl2
-    OVERRIDE_FIND_PACKAGE
-    GIT_REPOSITORY "https://github.com/libsdl-org/SDL"
-    GIT_TAG release-2.30.8
-    SYSTEM)
-  FetchContent_MakeAvailable(sdl2)
+  # FetchContent_Declare(
+  #   sdl2
+  #   OVERRIDE_FIND_PACKAGE
+  #   GIT_REPOSITORY "https://github.com/libsdl-org/SDL"
+  #   GIT_TAG release-2.30.8
+  #   SYSTEM)
+  # FetchContent_MakeAvailable(sdl2)
 endif()
 
 set(IMGUI_SRCS

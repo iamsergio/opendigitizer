@@ -6,7 +6,7 @@ set(projectName "opendigitizer-ui")
 project(${projectName} LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+# set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 if(EMSCRIPTEN)

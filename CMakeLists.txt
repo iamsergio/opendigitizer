@@ -10,6 +10,22 @@ set(EMCMAKE_COMMAND
     "emcmake"
     CACHE FILEPATH "Path to the emcmake command")
 
+if(OPENDIGITIZER_ENABLE_ASAN)
+  add_compile_options(-fsanitize=address)
+  add_link_options(-fsanitize=address)
+endif()
+
+if(NOT CMAKE_CXX_COMPILER_ID MATCHES ".*Clang" AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 15.0)
+    add_compile_options(-Wno-error=template-body -Wno-deprecated-literal-operator)
+endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang") # set default C++ STL to Clang's libc++ when using Clang
+  add_compile_options(-stdlib=libc++ -fexperimental-library)
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -stdlib=libc++ -lc++")
+endif()
+
+
 include(ExternalProject)
 
 # Mainly for FMT
@@ -61,6 +77,13 @@ add_library(project_warnings INTERFACE) # Link this 'library' to use the warning
 include(cmake/CompilerWarnings.cmake)
 set_project_warnings(project_warnings)
 
+# personal
+if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fuse-ld=lld")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fuse-ld=lld")
+  set(LINK_FLAGS "${LINK_FLAGS} -fuse-ld=lld")
+endif()
+
 add_subdirectory(src/acquisition)
 add_subdirectory(src/utils)
 add_subdirectory(src/ui)
@@ -93,4 +116,4 @@ if(NOT DISABLE_WASM_BUILD)
       ${ROOT_BUILD_DIR}/ui-wasm/web)
 endif()
 
-add_subdirectory(src/service)
+# add_subdirectory(src/service)

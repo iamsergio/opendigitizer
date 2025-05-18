@@ -165,13 +165,16 @@ auto UiGraphModel::findPortIteratorByName(auto& ports, const std::string& portNa
 
 bool UiGraphModel::handleBlockRemoved(const std::string& uniqueName) {
     auto [blockIt, found] = findBlockIteratorByUniqueName(uniqueName);
+    fmt::println("BLOCK REMOVED {} {}", uniqueName, found);
     if (!found) {
         requestGraphUpdate();
         return false;
     }
 
     // Delete edges for the removed block
+    fmt::println("NUM BEFORE {}", _edges.size());
     removeEdgesForBlock(*blockIt);
+    fmt::println("NUM after {}", _edges.size());
     _blocks.erase(blockIt);
     _rearrangeBlocks = true;
     return true;
@@ -469,7 +472,11 @@ bool UiGraphModel::setEdgeData(auto& edge, const gr::property_map& edgeData) {
 }
 
 void UiGraphModel::removeEdgesForBlock(UiGraphBlock& block) {
+    fmt::println("trying to delete {}", block.blockUniqueName);
     std::erase_if(_edges, [blockPtr = std::addressof(block)](const auto& edge) {
+        fmt::println("edge considered {} {} {}", edge.edgeSourcePort->ownerBlock->blockUniqueName, edge.edgeDestinationPort->ownerBlock->blockUniqueName,
+            (edge.edgeSourcePort->ownerBlock == blockPtr || //
+                edge.edgeDestinationPort->ownerBlock == blockPtr));
         return edge.edgeSourcePort->ownerBlock == blockPtr || //
                edge.edgeDestinationPort->ownerBlock == blockPtr;
     });

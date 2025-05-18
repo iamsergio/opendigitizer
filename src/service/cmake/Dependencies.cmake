@@ -9,9 +9,9 @@ FetchContent_Declare(
 
 FetchContent_Declare(
         gnuradio4
-        GIT_REPOSITORY https://github.com/fair-acc/gnuradio4.git
-        GIT_TAG ${GIT_SHA_GNURADIO4}
-        SYSTEM)
+        SYSTEM
+        SOURCE_DIR /data/sources/fair/gnuradio4/
+)
 
 FetchContent_Declare(
         gr-digitizers

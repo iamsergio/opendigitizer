@@ -141,14 +141,14 @@ void UiGraphModel::requestAvailableBlocksTypesUpdate() {
 }
 
 auto UiGraphModel::findBlockIteratorByUniqueName(const std::string& uniqueName) {
-    auto it = std::ranges::find_if(_blocks, [&](const auto& block) { return block.blockUniqueName == uniqueName; });
+    auto it = std::ranges::find_if(_blocks, [&](const auto& block) { return block->blockUniqueName == uniqueName; });
     return std::make_pair(it, it != _blocks.end());
 }
 
 UiGraphBlock* UiGraphModel::findBlockByUniqueName(const std::string& uniqueName) {
     auto [it, found] = findBlockIteratorByUniqueName(uniqueName);
     if (found) {
-        return std::addressof(*it);
+        return it->get();
     } else {
         return nullptr;
     }
@@ -173,7 +173,7 @@ bool UiGraphModel::handleBlockRemoved(const std::string& uniqueName) {
 
     // Delete edges for the removed block
     fmt::println("NUM BEFORE {}", _edges.size());
-    removeEdgesForBlock(*blockIt);
+    removeEdgesForBlock(*blockIt->get());
     fmt::println("NUM after {}", _edges.size());
     _blocks.erase(blockIt);
     _rearrangeBlocks = true;
@@ -184,10 +184,11 @@ void UiGraphModel::handleBlockEmplaced(const gr::property_map& blockData) {
     const auto uniqueName  = getProperty<std::string>(blockData, "uniqueName"s);
     const auto [it, found] = findBlockIteratorByUniqueName(uniqueName);
     if (found) {
-        setBlockData(*it, blockData);
+        setBlockData(**it, blockData);
     } else {
-        auto& newBlock = _blocks.emplace_back(/*owner*/ this);
-        setBlockData(newBlock, blockData);
+        auto newBlock = std::make_unique<UiGraphBlock>(/*owner*/ this);
+        setBlockData(*newBlock, blockData);
+        _blocks.push_back(std::move(newBlock));
     }
 }
 
@@ -198,7 +199,7 @@ void UiGraphModel::handleBlockDataUpdated(const std::string& uniqueName, const g
         return;
     }
 
-    setBlockData(*blockIt, blockData);
+    setBlockData(**blockIt, blockData);
 }
 
 void UiGraphModel::handleBlockSettingsChanged(const std::string& uniqueName, const gr::property_map& data) {
@@ -209,8 +210,8 @@ void UiGraphModel::handleBlockSettingsChanged(const std::string& uniqueName, con
     }
     for (const auto& [key, value] : data) {
         if (key != "unique_name"s) {
-            blockIt->blockSettings.insert_or_assign(key, value);
-            blockIt->updateBlockSettingsMetaInformation();
+            (*blockIt)->blockSettings.insert_or_assign(key, value);
+            (*blockIt)->updateBlockSettingsMetaInformation();
         }
     }
     _rearrangeBlocks = true;
@@ -228,7 +229,7 @@ void UiGraphModel::handleBlockActiveContext(const std::string& uniqueName, const
     const auto ctx  = std::get<std::string>(data.at("context"));
     auto       time = std::get<std::uint64_t>(data.at("time"));
 
-    blockIt->activeContext = UiGraphBlock::ContextTime{
+    (*blockIt)->activeContext = UiGraphBlock::ContextTime{
         .context = ctx,
         .time    = time,
     };
@@ -253,7 +254,7 @@ void UiGraphModel::handleBlockAllContexts(const std::string& uniqueName, const g
             .time    = times[i],
         });
     }
-    blockIt->contexts = contextAndTimes;
+    (*blockIt)->contexts = contextAndTimes;
 
     _rearrangeBlocks = true;
 }
@@ -265,8 +266,8 @@ void UiGraphModel::handleBlockAddOrRemoveContext(const std::string& uniqueName, 
         return;
     }
 
-    blockIt->getAllContexts();
-    blockIt->getActiveContext();
+    (*blockIt)->getAllContexts();
+    (*blockIt)->getActiveContext();
 
     _rearrangeBlocks = true;
 }
@@ -297,7 +298,7 @@ void UiGraphModel::handleGraphRedefined(const gr::property_map& data) {
     for (const auto& [childUniqueName, blockData] : children) {
         const auto [blockIt, found] = findBlockIteratorByUniqueName(childUniqueName);
         if (found) {
-            setBlockData(*blockIt, std::get<gr::property_map>(blockData));
+            setBlockData(**blockIt, std::get<gr::property_map>(blockData));
         } else {
             handleBlockEmplaced(std::get<gr::property_map>(blockData));
         }
@@ -307,10 +308,10 @@ void UiGraphModel::handleGraphRedefined(const gr::property_map& data) {
     // This is similar to erase-remove, but we need the list of blocks
     // we want to delete in order to disconnect them first.
     const auto toRemove = std::partition(_blocks.begin(), _blocks.end(), [&children](const auto& child) { //
-        return children.contains(child.blockUniqueName);
+        return children.contains(child->blockUniqueName);
     });
     for (auto it = toRemove; it != _blocks.end(); ++it) {
-        removeEdgesForBlock(*it);
+        removeEdgesForBlock(*it->get());
     }
 
     _blocks.erase(toRemove, _blocks.end());
